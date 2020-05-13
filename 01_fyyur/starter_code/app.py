@@ -729,6 +729,10 @@ def edit_venue(venue_id):
   form.genres.data = geners
   
   venue["genres"] = geners
+
+  venue["address"] = venue_obj.address
+  form.address.data = venue_obj.address
+
   venue["city"] = venue_obj.city
   form.city.data = venue_obj.city
 
@@ -789,22 +793,24 @@ def edit_venue_submission(venue_id):
     venue.city = request.form['city']
     venue.state = request.form['state']
     venue.phone = request.form['phone']
+    venue.address = request.form['address']
+
     venue.facebook_link = request.form['facebook_link']
     
     # get file image and save it under image folder, and rename image file after name of venue
-    if request.files:
-      # remove old file
-      print('herere')
-      imgfile = old_venue_img
-      print('herere2222222222222' + imgfile)
-      # if os.path.isfile(os.path.join(app.config["IMAGE_UPLOADS"], imgfile)):
-      #   os.remove(imgfile)
-      #   print('removed ------------------------------')
-      # Add new file image
-      image = request.files["image_link"]
-      image_name = request.form['name'] + '_Image.' + request.files["image_link"].filename.rsplit(".", 1)[1]
-      venue.image_link= image_name
-      image.save(os.path.join(app.config["IMAGE_UPLOADS"], image_name))
+    # if request.files:
+    #   # remove old file
+    #   print('herere')
+    #   imgfile = old_venue_img
+    #   print('999999999999999999999999999999999999 ' + imgfile)
+    #   # if os.path.isfile(os.path.join(app.config["IMAGE_UPLOADS"], imgfile)):
+    #   #   os.remove(imgfile)
+    #   #   print('removed ------------------------------')
+    #   # Add new file image
+    #   image = request.files["image_link"]
+    #   image_link = request.form['name'] + '_Image.' + request.files["image_link"].filename.rsplit(".", 1)[1]
+    #   venue.image_link= image_link
+    #   image.save(os.path.join(app.config["IMAGE_UPLOADS"], image_link))
 
     venue.website = request.form['website']
     # print(request.form['seeking_venue'])
@@ -828,15 +834,17 @@ def edit_venue_submission(venue_id):
     # print(new_geners)
     # print('---------------------------------------------------------------')
     
-    for new_genere in set(new_geners).difference(added_geners):
-      venuegener = VenueGeners(name=new_genere)
-      venuegener.venue = venue
-      # print('---------------------------added ------------------------------')
-      # print(new_genere)
-
-    for genere_to_be_deleted in set(added_geners).difference(new_geners):
+    if set(new_geners).difference(added_geners) is not None:
+      for new_genere in set(new_geners).difference(added_geners):
+        venuegener = VenueGeners(name=new_genere)
+        venuegener.venue = venue
+        print('---------------------------added ------------------------------')
+        print(new_genere)
+        
+    if set(added_geners).difference(new_geners) is not None:
+      for genere_to_be_deleted in set(added_geners).difference(new_geners):
       # print(genere_to_be_deleted)
-      db.session.query(VenueGeners).filter(VenueGeners.name == genere_to_be_deleted, VenueGeners.venue_id == venue.id).delete()
+        db.session.query(VenueGeners).filter(VenueGeners.name == genere_to_be_deleted, VenueGeners.vanue_id == venue.id).delete()
     
 
     db.session.commit()
