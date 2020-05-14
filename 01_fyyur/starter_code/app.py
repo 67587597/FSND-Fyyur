@@ -214,12 +214,17 @@ def search_venues():
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
+@app.route('/venues/<int:venue_id>/')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   
   data = {}
   venue = Venue.query.get(venue_id)
+  if venue is None:
+    flash('There is no venue with enterd ID, Try with another ID')
+    return redirect(url_for('index'))
+
   data["id"] = venue.id
   data["name"] = venue.name
   data["address"] = venue.address
@@ -458,12 +463,17 @@ def search_artists():
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
+@app.route('/artists/<int:artist_id>/')
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id  
   
   data = {}
   artist = Artist.query.get(artist_id)
+  if artist is None:
+    flash('There is no artist with enterd ID, Try with another ID')
+    return redirect(url_for('index'))
+
   data["id"] = artist.id
   data["name"] = artist.name
   geners = []
@@ -840,10 +850,10 @@ def edit_venue_submission(venue_id):
         venuegener.venue = venue
         print('---------------------------added ------------------------------')
         print(new_genere)
-        
+
     if set(added_geners).difference(new_geners) is not None:
       for genere_to_be_deleted in set(added_geners).difference(new_geners):
-      # print(genere_to_be_deleted)
+        print(genere_to_be_deleted)
         db.session.query(VenueGeners).filter(VenueGeners.name == genere_to_be_deleted, VenueGeners.vanue_id == venue.id).delete()
     
 
